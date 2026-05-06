@@ -2,31 +2,32 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>Audio Editor</title>
+    <title>Audio Editor Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.all.min.js"></script>
     <style>
         :root {
-            --primary: #007bff;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --accent: #22c55e;
+            --primary: #3b82f6;
+            --bg: #0a0a0c;
+            --card-bg: #16161a;
+            --text: #ffffff;
+            --accent: #10b981;
         }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: var(--card-bg); padding: 2rem; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 500px; border: 1px solid #334155; }
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary); letter-spacing: -0.025em; }
-        #drop-zone { border: 2px dashed #475569; padding: 2rem; text-align: center; cursor: pointer; border-radius: 0.75rem; background: #0f172a; transition: all 0.2s ease; margin-bottom: 1.5rem; }
-        #drop-zone:hover { border-color: var(--primary); background: #1e293b; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: var(--card-bg); padding: 2.5rem; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.6); width: 100%; max-width: 480px; border: 1px solid #2d2d35; }
+        h1 { text-align: center; font-size: 1.25rem; margin-bottom: 2rem; color: var(--text); opacity: 0.9; text-transform: uppercase; letter-spacing: 2px; }
+        #drop-zone { border: 2px dashed #3f3f46; padding: 3rem 1rem; text-align: center; cursor: pointer; border-radius: 1rem; background: #0f0f12; transition: 0.2s; margin-bottom: 1.5rem; }
+        #drop-zone:hover { border-color: var(--primary); background: #1a1a20; }
         .controls { display: none; }
-        .timer-display { font-size: 3.5rem; text-align: center; font-family: 'JetBrains Mono', monospace; color: var(--accent); margin: 1rem 0; font-variant-numeric: tabular-nums; text-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-        label { display: block; font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem; }
-        input[type="number"] { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #475569; background: #0f172a; color: white; font-size: 1rem; box-sizing: border-box; }
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; font-size: 1rem; }
-        button:hover { opacity: 0.9; }
-        button:disabled { background: #475569; cursor: not-allowed; }
-        audio { width: 100%; margin-bottom: 1rem; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
-        #status { text-align: center; margin-top: 1rem; font-size: 0.875rem; color: var(--accent); min-height: 1.25rem; }
+        .timer-display { font-size: 4rem; text-align: center; font-family: 'Courier New', monospace; color: var(--accent); margin-bottom: 1.5rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        label { display: block; font-size: 0.75rem; color: #a1a1aa; margin-bottom: 0.5rem; text-transform: uppercase; }
+        input[type="number"] { width: 100%; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid #3f3f46; background: #0a0a0c; color: white; font-size: 1.1rem; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--primary); }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 1.2rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        button:hover { background: #2563eb; transform: translateY(-1px); }
+        button:disabled { background: #27272a; cursor: not-allowed; transform: none; }
+        audio { width: 100%; margin-bottom: 1.5rem; height: 40px; }
+        #status { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #a1a1aa; height: 1.2rem; }
     </style>
 </head>
 <body>
@@ -34,8 +35,8 @@
 <div class="card">
     <h1>Audio Editor</h1>
     
-    <div id="drop-zone">Vyberte nebo přetáhněte zvukový soubor</div>
-    <input type="file" id="file-input" accept="audio/mp3, audio/wav" style="display: none;">
+    <div id="drop-zone">Vložte MP3 nebo WAV soubor</div>
+    <input type="file" id="file-input" accept="audio/*" style="display: none;">
 
     <div id="controls" class="controls">
         <div class="timer-display" id="time-display">0.00</div>
@@ -43,16 +44,16 @@
         
         <div class="input-grid">
             <div>
-                <label>Začátek (s)</label>
+                <label>Začátek (sekundy)</label>
                 <input type="number" id="start-time" value="0" step="0.01">
             </div>
             <div>
-                <label>Konec (s)</label>
+                <label>Konec (sekundy)</label>
                 <input type="number" id="end-time" value="0" step="0.01">
             </div>
         </div>
         
-        <button id="export-btn">Oříznout a stáhnout MP3</button>
+        <button id="export-btn">Stáhnout čisté MP3</button>
         <div id="status"></div>
     </div>
 </div>
@@ -71,7 +72,6 @@
     let audioBuffer;
     let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // Plynulá aktualizace času
     function updateTimer() {
         timeDisplay.innerText = player.currentTime.toFixed(2);
         requestAnimationFrame(updateTimer);
@@ -79,23 +79,28 @@
     requestAnimationFrame(updateTimer);
 
     dropZone.onclick = () => fileInput.click();
-    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#007bff"; };
-    dropZone.ondragleave = () => { dropZone.style.borderColor = "#475569"; };
+    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#3b82f6"; };
+    dropZone.ondragleave = () => { dropZone.style.borderColor = "#3f3f46"; };
     dropZone.ondrop = (e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); };
     fileInput.onchange = (e) => handleFile(e.target.files[0]);
 
     async function handleFile(file) {
         if (!file) return;
-        status.innerText = "Načítání...";
+        status.innerText = "Dekódování...";
         const reader = new FileReader();
         reader.onload = async (e) => {
-            const data = e.target.result;
-            player.src = URL.createObjectURL(file);
-            audioBuffer = await audioCtx.decodeAudioData(data);
-            endInput.value = audioBuffer.duration.toFixed(2);
-            controls.style.display = 'block';
-            dropZone.innerText = "Soubor připraven";
-            status.innerText = "";
+            try {
+                const data = e.target.result;
+                player.src = URL.createObjectURL(file);
+                audioBuffer = await audioCtx.decodeAudioData(data);
+                endInput.value = audioBuffer.duration.toFixed(2);
+                controls.style.display = 'block';
+                dropZone.innerText = "Soubor načten";
+                status.innerText = "";
+            } catch (err) {
+                alert("Nepodporovaný formát.");
+                status.innerText = "";
+            }
         };
         reader.readAsArrayBuffer(file);
     }
@@ -103,42 +108,51 @@
     exportBtn.onclick = async () => {
         const start = parseFloat(startInput.value);
         const end = parseFloat(endInput.value);
-        if (start >= end) return alert("Neplatný rozsah");
+        if (start >= end || start < 0) return alert("Zkontrolujte časy");
 
         exportBtn.disabled = true;
-        status.innerText = "Probíhá export do MP3...";
+        status.innerText = "Exportuji čistý zvuk...";
 
         const sampleRate = audioBuffer.sampleRate;
         const frameCount = Math.floor((end - start) * sampleRate);
         const startOffset = Math.floor(start * sampleRate);
 
+        // Získání kanálů
         const left = audioBuffer.getChannelData(0).slice(startOffset, startOffset + frameCount);
         const right = audioBuffer.numberOfChannels > 1 
             ? audioBuffer.getChannelData(1).slice(startOffset, startOffset + frameCount) 
-            : left;
+            : new Float32Array(left);
 
+        // Kódování s ochranou proti šumu (limiter/gain reduction)
         const mp3Blob = await encodeMp3(left, right, sampleRate);
         const url = URL.createObjectURL(mp3Blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = "upraveny_zvuk.mp3";
+        a.download = "export.mp3";
         a.click();
 
         exportBtn.disabled = false;
-        status.innerText = "Staženo";
+        status.innerText = "Dokončeno";
     };
 
     function encodeMp3(left, right, sampleRate) {
         return new Promise((resolve) => {
-            const encoder = new lamejs.Mp3Encoder(2, sampleRate, 128);
+            const encoder = new lamejs.Mp3Encoder(2, sampleRate, 192); // Vyšší bitrate pro čistotu
             const mp3Data = [];
-            const toInt16 = (f) => f < 0 ? f * 0x8000 : f * 0x7FFF;
             
+            // Ochrana proti clippingu (ztišení o cca 10% pro eliminaci šumu)
+            const volumeReduction = 0.9; 
+
             const lp = new Int16Array(left.length);
             const rp = new Int16Array(right.length);
+            
             for (let i = 0; i < left.length; i++) {
-                lp[i] = toInt16(left[i]);
-                rp[i] = toInt16(right[i]);
+                // Převod na Int16 s mírným ztišením
+                let sL = left[i] * volumeReduction;
+                let sR = right[i] * volumeReduction;
+                
+                lp[i] = sL < 0 ? sL * 0x8000 : sL * 0x7FFF;
+                rp[i] = sR < 0 ? sR * 0x8000 : sR * 0x7FFF;
             }
 
             const blockSize = 1152;
@@ -150,6 +164,7 @@
             }
             const final = encoder.flush();
             if (final.length > 0) mp3Data.push(final);
+            
             resolve(new Blob(mp3Data, { type: 'audio/mp3' }));
         });
     }
